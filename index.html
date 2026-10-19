@@ -18,6 +18,8 @@
     --stamp: #1f4fa8;
   }
   * { box-sizing: border-box; }
+  /* clip, not hidden: no horizontal scroll on mobile without breaking scrollIntoView */
+  html, body { overflow-x: clip; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
@@ -28,7 +30,8 @@
   }
 
   /* ---------- Certificate ---------- */
-  .cert-wrap { padding: 24px 12px 48px; }
+  /* The stamp starts at 3x scale before it slams down; clip it so it can't widen the page. */
+  .cert-wrap { padding: 24px 12px 48px; overflow-x: clip; }
   .cert {
     position: relative;
     max-width: 760px;
@@ -79,7 +82,6 @@
   .findings th, .findings td { text-align: left; vertical-align: top; padding: 9px 6px; border-top: 1px solid #e3dbc8; }
   .findings th { width: 34%; font-weight: 600; }
   .findings td small { color: var(--muted); }
-  .ok::before { content: "☑ "; color: #1b7d3a; }
 
   .fine {
     font-size: 12px; line-height: 1.5; color: var(--muted);
@@ -246,12 +248,12 @@
 
     <table class="findings">
       <caption>Erhobene Befunde</caption>
-      <tr><th class="ok">Taucher</th><td>Brevet gültig bis 57&nbsp;m Tiefe – ein Meter pro Jahr.<br><small>Ab nächstem Jahr bitte Trimix.</small></td></tr>
-      <tr><th class="ok">Töfffahrer</th><td>Ausweis Kat.&nbsp;A gültig. Lederkombi: passt noch (knapp).<br><small>Knie: bedingt kurventauglich.</small></td></tr>
-      <tr><th class="ok">F1-Experte</th><td>Weiss mehr über Reifenstrategie als die Ferrari-Box.<br><small>Anmerkung des Amtes: Das ist keine Kunst.</small></td></tr>
-      <tr><th class="ok">Chef-Tester</th><td>Offiziell zuständig für alle Apps von Bastian.<br><small>Standard-Fehlermeldung: «Das geht nicht. Fix das.»</small></td></tr>
-      <tr><th class="ok">Papa-Witz-Lizenz</th><td>Abgelaufen 1998. Wird trotzdem täglich verwendet.<br><small>Wird vom Amt geduldet.</small></td></tr>
-      <tr><th class="ok">Herzschläge bis heute</th><td>ca. 2'100'000'000 – alle noch funktionstüchtig.</td></tr>
+      <tr><th>Taucher</th><td>Brevet gültig bis 57&nbsp;m Tiefe – ein Meter pro Jahr.<br><small>Ab nächstem Jahr bitte Trimix.</small></td></tr>
+      <tr><th>Töfffahrer</th><td>Ausweis Kat.&nbsp;A gültig. Lederkombi: passt noch (knapp).<br><small>Knie: bedingt kurventauglich.</small></td></tr>
+      <tr><th>F1-Experte</th><td>Weiss mehr über Reifenstrategie als die Ferrari-Box.<br><small>Anmerkung des Amtes: Das ist keine Kunst.</small></td></tr>
+      <tr><th>Chef-Tester</th><td>Offiziell zuständig für alle Apps von Bastian.<br><small>Standard-Fehlermeldung: «Das geht nicht. Fix das.»</small></td></tr>
+      <tr><th>Papa-Witz-Lizenz</th><td>Abgelaufen 1998. Wird trotzdem täglich verwendet.<br><small>Wird vom Amt geduldet.</small></td></tr>
+      <tr><th>Herzschläge bis heute</th><td>ca. 2'100'000'000 – alle noch funktionstüchtig.</td></tr>
     </table>
 
     <div class="fine">
