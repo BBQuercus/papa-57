@@ -27,7 +27,11 @@
     color: var(--ink);
     background: #e9e4d8;
     -webkit-tap-highlight-color: transparent;
+    text-wrap: pretty; /* avoid lone words on the last line */
   }
+  /* Short, centred copy reads best with evenly balanced lines. */
+  h1, h2, .sub, .lead, .kicker, .verdict, .status .tip, .muted, .card .q, .card .a, .groan, #ticket, .bye,
+  .qmsg, .env-tip, .err, .qticket { text-wrap: balance; }
 
   /* ---------- Certificate ---------- */
   /* The stamp starts at 3x scale before it slams down; clip it so it can't widen the page. */
@@ -81,7 +85,13 @@
   }
   .findings th, .findings td { text-align: left; vertical-align: top; padding: 9px 6px; border-top: 1px solid #e3dbc8; }
   .findings th { width: 34%; font-weight: 600; }
-  .findings td small { color: var(--muted); }
+  .findings td small { display: block; margin-top: 2px; color: var(--muted); }
+  /* Phones: label above its finding, so the text gets the full width. */
+  @media (max-width: 520px) {
+    .findings tr { display: block; border-top: 1px solid #e3dbc8; padding: 10px 0; }
+    .findings th, .findings td { display: block; width: auto; border: 0; padding: 0; }
+    .findings th { margin-bottom: 2px; }
+  }
 
   .fine {
     font-size: 12px; line-height: 1.5; color: var(--muted);
@@ -117,6 +127,8 @@
     transition: transform .08s, box-shadow .08s;
   }
   .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8f1c13; }
+  .btn { white-space: nowrap; }
+  @media (max-width: 350px) { .btn { font-size: 14px; padding: 12px 14px; } }
   .btn.ghost { background: transparent; color: var(--muted); box-shadow: none; font-weight: 400; padding: 13px 8px; }
   .err { color: var(--red); font-size: 14px; min-height: 1.2em; margin: 10px 0 0; }
 
@@ -178,8 +190,12 @@
   .status .verdict { font-size: 18px; color: #f2f2f2; margin-top: 8px; }
   .status .tip { color: #8d909b; font-size: 14px; margin-top: 6px; }
   .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
-  .cell { background: #1c1e25; border: 1px solid #2c2f39; border-radius: 8px; padding: 12px; }
-  .cell span { display: block; font-size: 11px; color: #8d909b; text-transform: uppercase; letter-spacing: .1em; }
+  /* Labels may wrap on narrow phones; values stay on one shared baseline at the bottom. */
+  .cell {
+    background: #1c1e25; border: 1px solid #2c2f39; border-radius: 8px; padding: 10px 12px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
+  }
+  .cell span { display: block; font-size: 10.5px; line-height: 1.3; color: #8d909b; text-transform: uppercase; letter-spacing: .08em; }
   .cell b { font-size: 22px; font-variant-numeric: tabular-nums; }
   .cell.best b { color: #a855f7; } /* F1 purple sector */
 
@@ -193,8 +209,8 @@
     min-height: 170px; display: grid; place-items: center; cursor: pointer;
     box-shadow: 0 10px 30px rgba(40,30,10,.08);
   }
-  .card .q { font-size: 21px; line-height: 1.4; }
-  .card .a { font-family: "Caveat", cursive; font-size: 34px; color: var(--red); margin-top: 12px; display: none; }
+  .card .q { font-size: clamp(18px, 5.6vw, 21px); line-height: 1.4; }
+  .card .a { font-family: "Caveat", cursive; font-size: clamp(24px, 7.5vw, 34px); color: var(--red); margin-top: 12px; display: none; }
   .card.revealed .a { display: block; animation: pop .3s; }
   .card .tap { color: #b7ae99; font-size: 13px; margin-top: 10px; }
   .card.revealed .tap { display: none; }
@@ -205,7 +221,9 @@
     background: var(--red); color: #fff; text-align: center; padding: 40px 16px 24px;
     font-family: "Titillium Web", sans-serif; position: relative; overflow: hidden;
   }
-  footer .bye { font-family: "Caveat", cursive; font-size: clamp(38px, 10vw, 60px); line-height: 1.1; }
+  /* Sized to the footer's width so the greeting stays on one line on any phone. */
+  footer { container-type: inline-size; }
+  footer .bye { font-family: "Caveat", cursive; font-size: clamp(24px, calc(100cqw / 8.6), 60px); line-height: 1.1; }
   footer p { opacity: .85; margin: 8px 0 18px; }
   /* Never receives pointer events, so no tilt or bounce can ever let a click land. */
   #bug {
@@ -225,18 +243,18 @@
 
   .icon { width: 1.1em; height: 1.1em; vertical-align: -.2em; flex: none; }
   footer p .icon { fill: currentColor; }
-  .pb { color: #a855f7; font-weight: 700; }
+  .pb { display: block; color: #a855f7; font-weight: 700; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 
   /* ---------- Intro: pickup notice → queue ticket → registered letter ---------- */
   body.intro-on > :not(#intro):not(#confetti):not(script) { display: none; }
   #intro {
-    min-height: 100svh; display: grid; place-items: center; padding: 24px 14px;
+    min-height: 100svh; display: grid; place-items: center; padding: 14px 14px;
     background: repeating-linear-gradient(0deg, #e9e4d8 0 38px, #e4decf 38px 40px);
   }
   #intro.leaving { animation: fadeOut .5s forwards; }
   @keyframes fadeOut { to { opacity: 0; } }
-  .stage { display: none; width: min(440px, 100%); justify-items: center; gap: 18px; text-align: center; }
+  .stage { display: none; width: min(440px, 100%); justify-items: center; gap: 12px; text-align: center; }
   .stage.on { display: grid; animation: stageIn .5s cubic-bezier(.2,.9,.3,1.1); }
   @keyframes stageIn { from { opacity: 0; transform: translateY(24px); } }
   .btn.dark { background: var(--ink); box-shadow: 0 3px 0 #000; }
@@ -248,7 +266,7 @@
   .slip {
     position: relative; width: 100%; text-align: left; background: #ffcc00;
     background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 4px 4px;
-    padding: 30px 20px 20px; border-radius: 2px 2px 4px 4px;
+    padding: 22px 18px 16px; border-radius: 2px 2px 4px 4px;
     box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 18px 36px rgba(60,40,0,.22);
     transform: rotate(-1deg); animation: slipIn .7s cubic-bezier(.2,.9,.3,1.1);
   }
@@ -262,12 +280,12 @@
   .slip h2 { font: 900 clamp(22px, 6.5vw, 28px)/1 "Titillium Web", sans-serif; text-transform: uppercase; margin: 0; }
   .tri { font-size: 12px; font-style: italic; margin-top: 4px; opacity: .75; }
   .rbox { width: 46px; height: 46px; flex: none; border: 3px solid var(--ink); display: grid; place-items: center; font: 900 30px "Titillium Web"; }
-  .slip p { font-size: 15px; line-height: 1.5; margin: 16px 0; }
-  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0 0 16px; }
+  .slip p { font-size: 14.5px; line-height: 1.45; margin: 10px 0 12px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin: 0 0 12px; }
   .fields div { min-width: 0; }
   .fields .wide { grid-column: 1 / -1; }
-  .fields dd { margin: 2px 0 0; padding-bottom: 2px; border-bottom: 1.5px dotted rgba(29,36,51,.5); font-size: 14px; min-height: 26px; display: flex; align-items: flex-end; }
-  .boxes { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; margin-bottom: 18px; }
+  .fields dd { margin: 2px 0 0; padding-bottom: 2px; border-bottom: 1.5px dotted rgba(29,36,51,.5); font-size: 14px; min-height: 24px; display: flex; align-items: flex-end; }
+  .boxes { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; margin-bottom: 14px; }
   .boxes span::before {
     content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid var(--ink);
   }
@@ -275,28 +293,29 @@
     background: linear-gradient(45deg, transparent 42%, #12306e 42% 58%, transparent 58%),
                 linear-gradient(-45deg, transparent 42%, #12306e 42% 58%, transparent 58%);
   }
-  .slip-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-  .barcode { height: 40px; width: 130px; }
-  .barcode + .mono { font-size: 14px; }
+  .slip-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  .barcode { display: block; height: 30px; width: 96px; }
+  .barcode + .mono { font-size: 12px; white-space: nowrap; }
+  .slip-foot .btn { padding: 12px 14px; font-size: 15px; white-space: nowrap; }
 
   .qboard {
-    width: 100%; background: #111; border-radius: 8px; padding: 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 2px 16px;
+    width: 100%; background: #111; border-radius: 8px; padding: 8px 14px; display: grid; grid-template-columns: 1fr auto; gap: 2px 16px;
     text-align: left; box-shadow: inset 0 0 0 3px #2a2a2a, 0 10px 30px rgba(0,0,0,.25);
   }
   .qboard .lbl { color: #888; }
-  .led { font-family: "VT323", monospace; font-size: 64px; line-height: 1; color: #ff3b2f; text-shadow: 0 0 12px rgba(255,59,47,.7); }
-  .led.small { font-size: 40px; text-align: center; }
+  .led { font-family: "VT323", monospace; font-size: 50px; line-height: 1; color: #ff3b2f; text-shadow: 0 0 12px rgba(255,59,47,.7); }
+  .led.small { font-size: 34px; text-align: center; }
   .led.blink { animation: blink .5s steps(2) 6; }
   @keyframes blink { 50% { opacity: .15; } }
-  .qmsg { min-height: 2.8em; font-size: 15px; color: #444; display: grid; place-items: center; }
+  .qmsg { min-height: 2.8em; line-height: 1.4; font-size: 15px; color: #444; display: grid; place-items: center; }
   .machine {
     position: relative; width: 220px; background: linear-gradient(#d52b1e, #a81f15); border-radius: 18px 18px 8px 8px;
-    padding: 16px 18px 28px; color: #fff; box-shadow: 0 16px 30px rgba(0,0,0,.25); margin-bottom: 196px;
+    padding: 12px 16px 24px; color: #fff; box-shadow: 0 16px 30px rgba(0,0,0,.25); margin-bottom: 118px;
   }
   .machine b { display: block; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
   .machine small { opacity: .85; }
   .pull {
-    margin-top: 14px; width: 96px; height: 96px; border-radius: 50%; border: 6px solid #fff; background: #ffcc00; color: var(--ink);
+    margin-top: 10px; width: 84px; height: 84px; border-radius: 50%; border: 6px solid #fff; background: #ffcc00; color: var(--ink);
     font: 900 14px/1.2 "Titillium Web"; cursor: pointer; box-shadow: 0 6px 0 #a88600; transition: transform .08s, box-shadow .08s;
   }
   .pull:active { transform: translateY(5px); box-shadow: 0 1px 0 #a88600; }
@@ -304,11 +323,11 @@
   .slot { position: absolute; left: 30px; right: 30px; bottom: 9px; height: 8px; background: #2a0b08; border-radius: 4px; }
   .qticket {
     position: absolute; left: 40px; right: 40px; top: calc(100% - 8px); background: #fffdf7; color: var(--ink);
-    padding: 10px 8px 12px; font-size: 12px; line-height: 1.35; border-bottom: 2px dashed #ccc;
+    padding: 6px 8px 8px; font-size: 11.5px; line-height: 1.3; border-bottom: 2px dashed #ccc;
     box-shadow: 0 6px 12px rgba(0,0,0,.15); clip-path: inset(0 0 100% 0); transition: clip-path 1.4s steps(14);
   }
   .qticket.out { clip-path: inset(0 0 0 0); }
-  .qticket .nr { font: 900 46px/1 "Titillium Web"; margin: 4px 0; }
+  .qticket .nr { font: 900 38px/1 "Titillium Web"; margin: 2px 0; }
   .qticket small { color: #6b6f7a; font-size: 10.5px; }
   .qactions { min-height: 50px; display: flex; justify-content: center; }
 
@@ -377,19 +396,18 @@
         <div><h2>Abholungs&shy;einladung</h2><div class="tri">Avis de retrait · Avviso di ritiro</div></div>
         <div class="rbox">R</div>
       </div>
-      <p>Wir haben heute versucht, Ihnen Ihren <b>57. Geburtstag</b> zuzustellen. Leider waren Sie nicht anzutreffen – vermutlich auf dem Töff oder 30&nbsp;Meter unter Wasser.</p>
+      <p>Wir haben heute versucht, Ihnen Ihren <b>57. Geburtstag</b> zuzustellen. Leider waren Sie nicht anzutreffen – vermutlich auf dem Töff oder 30&nbsp;Meter unter Wasser. Nach Ablauf der Frist geht die Sendung zurück an die Jugend.</p>
       <dl class="fields">
         <div class="wide"><dt class="lbl">Absender</dt><dd>Bundesamt für Älterwerden, Bern</dd></div>
         <div><dt class="lbl">Empfänger</dt><dd class="ink">Papa</dd></div>
         <div><dt class="lbl">Gewicht</dt><dd class="ink">57 Jahre netto</dd></div>
         <div><dt class="lbl">Abholort</dt><dd class="ink">Schalter 3</dd></div>
         <div><dt class="lbl">Abholfrist</dt><dd>57 Tage</dd></div>
-        <div class="wide"><dt class="lbl">Danach</dt><dd>Rücksendung an die Jugend</dd></div>
       </dl>
       <div class="boxes"><span>Paket</span><span class="x">Brief</span><span class="x">Eingeschrieben</span><span class="x">Zerbrechlich (Knie)</span></div>
       <div class="slip-foot">
         <div><svg class="barcode" id="barcode" preserveAspectRatio="none" aria-hidden="true"></svg><div class="mono">RR 057 057 057 CH</div></div>
-        <button class="btn dark" id="pickup">Sendung abholen →</button>
+        <button class="btn dark" id="pickup">Abholen →</button>
       </div>
     </article>
   </div>
@@ -407,10 +425,10 @@
       <button class="pull" id="pull">Nummer<br>ziehen</button>
       <div class="slot"></div>
       <div class="qticket" id="q-ticket">
-        Bundesamt für Älterwerden
+        <small>Bundesamt für Älterwerden</small>
         <div class="nr">57</div>
-        Wartende vor Ihnen: 18<br>
-        <small>Geschätzte Wartezeit: 57 Jahre<br>Bitte Ticket nicht knicken.</small>
+        Wartezeit: 57&nbsp;Jahre<br>
+        <small>Bitte Ticket nicht knicken.</small>
       </div>
     </div>
     <div class="qactions" id="q-actions"></div>
@@ -458,16 +476,16 @@
 
     <p class="lead">Hiermit wird amtlich bestätigt, dass</p>
     <div class="name">Papa</div>
-    <p class="lead">heute seinen <strong>57. Geburtstag</strong> feiert und somit offiziell als<br><strong>Vintage</strong> (noch kein Oldtimer) eingestuft wird.</p>
+    <p class="lead">heute seinen <strong>57. Geburtstag</strong> feiert und somit offiziell als <strong>Vintage</strong> (noch kein Oldtimer) eingestuft wird.</p>
 
     <table class="findings">
       <caption>Erhobene Befunde</caption>
-      <tr><th>Taucher</th><td>Brevet gültig bis 57&nbsp;m Tiefe – ein Meter pro Jahr.<br><small>Ab nächstem Jahr bitte Trimix.</small></td></tr>
-      <tr><th>Töfffahrer</th><td>Ausweis Kat.&nbsp;A gültig. Lederkombi: passt noch (knapp).<br><small>Knie: bedingt kurventauglich.</small></td></tr>
-      <tr><th>F1-Experte</th><td>Weiss mehr über Reifenstrategie als die Ferrari-Box.<br><small>Anmerkung des Amtes: Das ist keine Kunst.</small></td></tr>
-      <tr><th>Chef-Tester</th><td>Offiziell zuständig für alle Apps von Bastian.<br><small>Standard-Fehlermeldung: «Das geht nicht. Fix das.»</small></td></tr>
-      <tr><th>Papa-Witz-Lizenz</th><td>Abgelaufen 1998. Wird trotzdem täglich verwendet.<br><small>Wird vom Amt geduldet.</small></td></tr>
-      <tr><th>Herzschläge bis heute</th><td>ca. 2'100'000'000 – alle noch funktionstüchtig.</td></tr>
+      <tr><th>Taucher</th><td>Brevet gültig bis 57&nbsp;m Tiefe – ein Meter pro Jahr.<small>Ab nächstem Jahr bitte Trimix.</small></td></tr>
+      <tr><th>Töfffahrer</th><td>Ausweis Kat.&nbsp;A gültig. Lederkombi: passt noch (knapp).<small>Knie: bedingt kurventauglich.</small></td></tr>
+      <tr><th>F1-Experte</th><td>Weiss mehr über Reifenstrategie als die&nbsp;Ferrari-Box.<small>Anmerkung des Amtes: Das ist keine Kunst.</small></td></tr>
+      <tr><th>Chef-Tester</th><td>Offiziell zuständig für alle Apps von Bastian.<small>Standard-Fehlermeldung: «Das geht nicht. Fix das.»</small></td></tr>
+      <tr><th>Papa-Witz-Lizenz</th><td>Abgelaufen 1998. Wird trotzdem täglich verwendet.<small>Wird vom Amt geduldet.</small></td></tr>
+      <tr><th>Herzschläge bis heute</th><td>ca. 2'100'000'000 – alle noch&nbsp;funktionstüchtig.</td></tr>
     </table>
 
     <div class="fine">
@@ -792,7 +810,7 @@ const hit = () => {
   $("#last").textContent = fmt(ms);
   const isBest = !best || ms < best;
   if (isBest) { best = ms; localStorage.setItem("papa57-best", String(ms)); $("#best").textContent = fmt(ms); }
-  show(fmt(ms) + " s", verdict, isBest ? `<span class="pb">${icon("trophy")} Persönliche Bestzeit!</span> · Tippen für einen neuen Versuch` : "Tippen für einen neuen Versuch");
+  show(fmt(ms) + " s", verdict, isBest ? `<span class="pb">${icon("trophy")} Persönliche Bestzeit!</span>Tippen für einen neuen Versuch` : "Tippen für einen neuen Versuch");
   if (ms < 300) confetti(80);
 };
 
