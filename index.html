@@ -368,10 +368,11 @@
   #env-back { display: none; }
   .eb-base { position: absolute; inset: 0; border-radius: 6px; background: #e6dcc4; box-shadow: 0 16px 30px rgba(0,0,0,.2); }
   .eb-letter {
-    position: absolute; left: 14px; right: 14px; top: 10px; bottom: 10px; background: #fffdf7; border: 1px solid #ddd3bf;
-    padding: 14px; text-align: left; font: 13px/1.5 "IBM Plex Serif", serif; z-index: 1; transition: transform 1s cubic-bezier(.3,1.2,.4,1) .45s;
+    position: absolute; left: 14px; right: 14px; top: 10px; bottom: 10px; overflow: hidden; background: var(--paper);
+    z-index: 1; transition: transform .6s cubic-bezier(.3,1.2,.4,1) .3s;
   }
-  .eb-letter .lbl { display: block; margin-bottom: 4px; }
+  /* A scaled-down copy of the real certificate, so the morph only has to grow the paper. */
+  .cert.mini { position: absolute; top: 0; left: 0; margin: 0; transform-origin: top left; box-shadow: none; pointer-events: none; }
   .eb-pocket { position: absolute; inset: 0; z-index: 2; border-radius: 6px; background: linear-gradient(170deg, #f6f0e1, #ece3cc); clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%); }
   .eb-flap {
     position: absolute; left: 0; right: 0; top: 0; height: 62%; z-index: 3; background: #ddd2b6; transform-origin: top;
@@ -381,6 +382,13 @@
   .env-wrap.open .eb-letter { transform: translateY(-62%); }
   .env-tip { color: #6b6f7a; font-size: 14px; min-height: 2.8em; }
   .cert-wrap.arrive .cert { animation: arrive .8s cubic-bezier(.2,.9,.3,1.05); }
+  /* Letter → certificate morph: the paper grows while the rest of the intro fades away. */
+  ::view-transition-group(letter) { animation-duration: .6s; animation-timing-function: cubic-bezier(.4,0,.2,1); }
+  ::view-transition-old(letter) { animation: fadeOut .3s .2s both; }
+  ::view-transition-new(letter) { animation: vtFadeIn .3s both; }
+  ::view-transition-old(root) { animation: fadeOut .25s both; }
+  ::view-transition-new(root) { animation: vtFadeIn .3s .35s both; }
+  @keyframes vtFadeIn { from { opacity: 0; } }
   @keyframes arrive { from { opacity: 0; transform: translateY(60px) scale(.94); } }
 </style>
 </head>
@@ -446,7 +454,7 @@
       </div>
       <div class="env-face" id="env-back">
         <div class="eb-base"></div>
-        <div class="eb-letter"><span class="lbl">Bundesamt für Älterwerden</span><b>Amtliche Altersbescheinigung</b><br>Formular 57-B (Vintage-Ausführung)</div>
+        <div class="eb-letter"></div>
         <div class="eb-pocket"></div>
         <div class="eb-flap"></div>
       </div>
@@ -728,6 +736,19 @@ $("#pull").addEventListener("click", async () => {
   $("#q-go").onclick = () => goStage("st-env");
 });
 
+// The letter inside is a miniature clone of the certificate, scaled to the letter's width.
+const fillLetter = () => {
+  const mini = $(".cert").cloneNode(true);
+  mini.removeAttribute("id");
+  mini.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+  mini.querySelector(".sig-pad canvas").remove();
+  mini.classList.add("mini");
+  const certWidth = Math.min(760, innerWidth - 24); // .cert-wrap has 12px side padding
+  mini.style.width = `${certWidth}px`;
+  mini.style.transform = `scale(${$(".eb-letter").clientWidth / certWidth})`;
+  $(".eb-letter").replaceChildren(mini);
+};
+
 // First tap flips the envelope over, second tap opens it and hands over to the certificate.
 let envStep = 0;
 $("#env").addEventListener("click", async () => {
@@ -737,19 +758,33 @@ $("#env").addEventListener("click", async () => {
     $("#env-front").style.display = "none";
     $("#env-back").style.display = "block";
     $("#env-back").animate([{ transform: "rotateY(-90deg)" }, { transform: "rotateY(0)" }], { duration: 220, easing: "ease-out" });
+    fillLetter();
     $("#env-tip").textContent = "Nochmals antippen zum Öffnen.";
   } else if (envStep === 1) {
     envStep = 2;
     $("#env").classList.add("open");
     $("#env-tip").textContent = "Empfang quittiert. Quittung archiviert (Aufbewahrungsfrist: 57 Jahre).";
-    await wait(2300);
-    $("#intro").classList.add("leaving");
-    await wait(500);
-    document.body.classList.remove("intro-on");
-    $("#intro").remove();
-    $(".cert-wrap").classList.add("arrive");
-    sizePad(); // the pad had no size while hidden behind the intro
-    scrollTo(0, 0);
+    await wait(850);
+    const reveal = () => {
+      document.body.classList.remove("intro-on");
+      $("#intro").remove();
+      sizePad(); // the pad had no size while hidden behind the intro
+      scrollTo(0, 0);
+    };
+    // Morph the letter straight into the certificate. Browsers without View Transitions get a fade.
+    if (document.startViewTransition) {
+      $(".eb-letter").style.viewTransitionName = "letter";
+      await document.startViewTransition(() => {
+        reveal();
+        $(".cert").style.viewTransitionName = "letter";
+      }).finished;
+      $(".cert").style.viewTransitionName = "";
+    } else {
+      $("#intro").classList.add("leaving");
+      await wait(500);
+      reveal();
+      $(".cert-wrap").classList.add("arrive");
+    }
   }
 });
 
