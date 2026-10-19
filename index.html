@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23d52b1e'/><path d='M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z' fill='white'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Titillium+Web:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Titillium+Web:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root {
     --red: #d52b1e;
@@ -227,11 +227,215 @@
   footer p .icon { fill: currentColor; }
   .pb { color: #a855f7; font-weight: 700; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+  /* ---------- Intro: pickup notice → queue ticket → registered letter ---------- */
+  body.intro-on > :not(#intro):not(#confetti):not(script) { display: none; }
+  #intro {
+    min-height: 100svh; display: grid; place-items: center; padding: 24px 14px;
+    background: repeating-linear-gradient(0deg, #e9e4d8 0 38px, #e4decf 38px 40px);
+  }
+  #intro.leaving { animation: fadeOut .5s forwards; }
+  @keyframes fadeOut { to { opacity: 0; } }
+  .stage { display: none; width: min(440px, 100%); justify-items: center; gap: 18px; text-align: center; }
+  .stage.on { display: grid; animation: stageIn .5s cubic-bezier(.2,.9,.3,1.1); }
+  @keyframes stageIn { from { opacity: 0; transform: translateY(24px); } }
+  .btn.dark { background: var(--ink); box-shadow: 0 3px 0 #000; }
+  .btn.dark:active { box-shadow: 0 1px 0 #000; }
+  .lbl { font: 700 10.5px "Titillium Web", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #6b6f7a; }
+  .ink, .fields dd.ink { font-family: "Caveat", cursive; font-size: 24px; line-height: 1.1; color: #12306e; }
+  .mono { font-family: "VT323", monospace; font-size: 19px; letter-spacing: .04em; }
+
+  .slip {
+    position: relative; width: 100%; text-align: left; background: #ffcc00;
+    background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 4px 4px;
+    padding: 30px 20px 20px; border-radius: 2px 2px 4px 4px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 18px 36px rgba(60,40,0,.22);
+    transform: rotate(-1deg); animation: slipIn .7s cubic-bezier(.2,.9,.3,1.1);
+  }
+  @keyframes slipIn { from { opacity: 0; transform: translateY(60px) rotate(-6deg); } }
+  /* torn-off perforation along the top edge */
+  .slip::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -5px; height: 10px;
+    background: radial-gradient(circle at 6px 5px, #e9e4d8 4px, transparent 4.5px) 0 0 / 12px 10px repeat-x;
+  }
+  .slip-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .slip h2 { font: 900 clamp(22px, 6.5vw, 28px)/1 "Titillium Web", sans-serif; text-transform: uppercase; margin: 0; }
+  .tri { font-size: 12px; font-style: italic; margin-top: 4px; opacity: .75; }
+  .rbox { width: 46px; height: 46px; flex: none; border: 3px solid var(--ink); display: grid; place-items: center; font: 900 30px "Titillium Web"; }
+  .slip p { font-size: 15px; line-height: 1.5; margin: 16px 0; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0 0 16px; }
+  .fields div { min-width: 0; }
+  .fields .wide { grid-column: 1 / -1; }
+  .fields dd { margin: 2px 0 0; padding-bottom: 2px; border-bottom: 1.5px dotted rgba(29,36,51,.5); font-size: 14px; min-height: 26px; display: flex; align-items: flex-end; }
+  .boxes { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; margin-bottom: 18px; }
+  .boxes span::before {
+    content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid var(--ink);
+  }
+  .boxes .x::before {
+    background: linear-gradient(45deg, transparent 42%, #12306e 42% 58%, transparent 58%),
+                linear-gradient(-45deg, transparent 42%, #12306e 42% 58%, transparent 58%);
+  }
+  .slip-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .barcode { height: 40px; width: 130px; }
+  .barcode + .mono { font-size: 14px; }
+
+  .qboard {
+    width: 100%; background: #111; border-radius: 8px; padding: 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 2px 16px;
+    text-align: left; box-shadow: inset 0 0 0 3px #2a2a2a, 0 10px 30px rgba(0,0,0,.25);
+  }
+  .qboard .lbl { color: #888; }
+  .led { font-family: "VT323", monospace; font-size: 64px; line-height: 1; color: #ff3b2f; text-shadow: 0 0 12px rgba(255,59,47,.7); }
+  .led.small { font-size: 40px; text-align: center; }
+  .led.blink { animation: blink .5s steps(2) 6; }
+  @keyframes blink { 50% { opacity: .15; } }
+  .qmsg { min-height: 2.8em; font-size: 15px; color: #444; display: grid; place-items: center; }
+  .machine {
+    position: relative; width: 220px; background: linear-gradient(#d52b1e, #a81f15); border-radius: 18px 18px 8px 8px;
+    padding: 16px 18px 28px; color: #fff; box-shadow: 0 16px 30px rgba(0,0,0,.25); margin-bottom: 196px;
+  }
+  .machine b { display: block; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+  .machine small { opacity: .85; }
+  .pull {
+    margin-top: 14px; width: 96px; height: 96px; border-radius: 50%; border: 6px solid #fff; background: #ffcc00; color: var(--ink);
+    font: 900 14px/1.2 "Titillium Web"; cursor: pointer; box-shadow: 0 6px 0 #a88600; transition: transform .08s, box-shadow .08s;
+  }
+  .pull:active { transform: translateY(5px); box-shadow: 0 1px 0 #a88600; }
+  .pull:disabled { filter: saturate(.4); cursor: default; }
+  .slot { position: absolute; left: 30px; right: 30px; bottom: 9px; height: 8px; background: #2a0b08; border-radius: 4px; }
+  .qticket {
+    position: absolute; left: 40px; right: 40px; top: calc(100% - 8px); background: #fffdf7; color: var(--ink);
+    padding: 10px 8px 12px; font-size: 12px; line-height: 1.35; border-bottom: 2px dashed #ccc;
+    box-shadow: 0 6px 12px rgba(0,0,0,.15); clip-path: inset(0 0 100% 0); transition: clip-path 1.4s steps(14);
+  }
+  .qticket.out { clip-path: inset(0 0 0 0); }
+  .qticket .nr { font: 900 46px/1 "Titillium Web"; margin: 4px 0; }
+  .qticket small { color: #6b6f7a; font-size: 10.5px; }
+  .qactions { min-height: 50px; display: flex; justify-content: center; }
+
+  .env-wrap { perspective: 900px; width: 320px; max-width: 100%; aspect-ratio: 32 / 21; margin-top: 140px; position: relative; cursor: pointer; }
+  .env-face { position: absolute; inset: 0; border-radius: 6px; }
+  #env-front {
+    background: linear-gradient(160deg, #f8f3e6, #efe7d3); box-shadow: 0 16px 30px rgba(0,0,0,.2);
+    animation: slipIn .7s cubic-bezier(.2,.9,.3,1.1);
+  }
+  .rlabel { position: absolute; top: 14px; left: 14px; display: flex; background: #fff; border: 1.5px solid var(--ink); text-align: left; }
+  .rlabel b { font: 900 28px/1 "Titillium Web"; padding: 4px 8px; border-right: 1.5px solid var(--ink); display: grid; place-items: center; }
+  .rlabel span { padding: 4px 8px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; display: grid; }
+  .rlabel .mono { font-size: 15px; letter-spacing: 0; text-transform: none; }
+  .pstamp {
+    position: absolute; top: 12px; right: 14px; width: 54px; height: 64px; padding: 5px; background: #fff;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle 2.6px, transparent 95%, #000) -4px -4px / 8px 8px;
+    mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle 2.6px, transparent 95%, #000) -4px -4px / 8px 8px;
+  }
+  .pstamp div { height: 100%; background: var(--red); color: #fff; display: grid; place-items: center; align-content: center; gap: 2px; font: 900 15px "Titillium Web"; }
+  .pstamp svg { width: 18px; height: 18px; }
+  .postmark {
+    position: absolute; top: 26px; right: 40px; width: 70px; height: 70px; border-radius: 50%; border: 2px solid rgba(31,79,168,.6);
+    color: rgba(31,79,168,.75); font: 700 9px/1.3 "Titillium Web"; letter-spacing: .06em; display: grid; place-items: center; transform: rotate(-12deg);
+  }
+  .postmark::after {
+    content: ""; position: absolute; right: 100%; top: 18px; width: 70px; height: 34px;
+    background: repeating-linear-gradient(transparent 0 9px, rgba(31,79,168,.55) 9px 11px);
+    -webkit-mask: radial-gradient(ellipse at right, #000 60%, transparent 100%); mask: radial-gradient(ellipse at right, #000 60%, transparent 100%);
+  }
+  .window {
+    position: absolute; left: 20px; bottom: 22px; width: 58%; padding: 10px 14px; text-align: left; font-size: 13px; line-height: 1.35;
+    background: rgba(255,255,255,.65); border: 1px solid #d8cfb9; border-radius: 4px;
+  }
+  .confid {
+    position: absolute; right: 16px; bottom: 26px; color: var(--red); border: 2px solid var(--red); padding: 2px 6px;
+    font: 900 11px "Titillium Web"; letter-spacing: .14em; text-transform: uppercase; transform: rotate(-8deg);
+  }
+  #env-back { display: none; }
+  .eb-base { position: absolute; inset: 0; border-radius: 6px; background: #e6dcc4; box-shadow: 0 16px 30px rgba(0,0,0,.2); }
+  .eb-letter {
+    position: absolute; left: 14px; right: 14px; top: 10px; bottom: 10px; background: #fffdf7; border: 1px solid #ddd3bf;
+    padding: 14px; text-align: left; font: 13px/1.5 "IBM Plex Serif", serif; z-index: 1; transition: transform 1s cubic-bezier(.3,1.2,.4,1) .45s;
+  }
+  .eb-letter .lbl { display: block; margin-bottom: 4px; }
+  .eb-pocket { position: absolute; inset: 0; z-index: 2; border-radius: 6px; background: linear-gradient(170deg, #f6f0e1, #ece3cc); clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%); }
+  .eb-flap {
+    position: absolute; left: 0; right: 0; top: 0; height: 62%; z-index: 3; background: #ddd2b6; transform-origin: top;
+    clip-path: polygon(0 0, 100% 0, 50% 100%); transition: transform .55s ease-in-out, z-index 0s .27s;
+  }
+  .env-wrap.open .eb-flap { transform: rotateX(180deg); z-index: 0; }
+  .env-wrap.open .eb-letter { transform: translateY(-62%); }
+  .env-tip { color: #6b6f7a; font-size: 14px; min-height: 2.8em; }
+  .cert-wrap.arrive .cert { animation: arrive .8s cubic-bezier(.2,.9,.3,1.05); }
+  @keyframes arrive { from { opacity: 0; transform: translateY(60px) scale(.94); } }
 </style>
 </head>
-<body>
+<body class="intro-on">
 
 <canvas id="confetti"></canvas>
+
+<!-- Intro: a pickup notice sends him to the counter, he pulls a number, and Schalter 3 hands over the registered letter. -->
+<section id="intro">
+  <div class="stage on" id="st-slip">
+    <article class="slip">
+      <div class="slip-head">
+        <div><h2>Abholungs&shy;einladung</h2><div class="tri">Avis de retrait · Avviso di ritiro</div></div>
+        <div class="rbox">R</div>
+      </div>
+      <p>Wir haben heute versucht, Ihnen Ihren <b>57. Geburtstag</b> zuzustellen. Leider waren Sie nicht anzutreffen – vermutlich auf dem Töff oder 30&nbsp;Meter unter Wasser.</p>
+      <dl class="fields">
+        <div class="wide"><dt class="lbl">Absender</dt><dd>Bundesamt für Älterwerden, Bern</dd></div>
+        <div><dt class="lbl">Empfänger</dt><dd class="ink">Papa</dd></div>
+        <div><dt class="lbl">Gewicht</dt><dd class="ink">57 Jahre netto</dd></div>
+        <div><dt class="lbl">Abholort</dt><dd class="ink">Schalter 3</dd></div>
+        <div><dt class="lbl">Abholfrist</dt><dd>57 Tage</dd></div>
+        <div class="wide"><dt class="lbl">Danach</dt><dd>Rücksendung an die Jugend</dd></div>
+      </dl>
+      <div class="boxes"><span>Paket</span><span class="x">Brief</span><span class="x">Eingeschrieben</span><span class="x">Zerbrechlich (Knie)</span></div>
+      <div class="slip-foot">
+        <div><svg class="barcode" id="barcode" preserveAspectRatio="none" aria-hidden="true"></svg><div class="mono">RR 057 057 057 CH</div></div>
+        <button class="btn dark" id="pickup">Sendung abholen →</button>
+      </div>
+    </article>
+  </div>
+
+  <div class="stage" id="st-queue">
+    <div class="lbl">Bundesamt für Älterwerden · Wartebereich</div>
+    <div class="qboard">
+      <span class="lbl">Aktuelle Nummer</span><span class="lbl">Schalter</span>
+      <div class="led" id="q-now">38</div><div class="led small" id="q-desk">–</div>
+    </div>
+    <div class="qmsg" id="q-msg">Bitte Nummer ziehen und Platz nehmen.</div>
+    <div class="machine">
+      <b>Anliegen: Abholung</b>
+      <small>Kategorie 57 – Vintage</small><br>
+      <button class="pull" id="pull">Nummer<br>ziehen</button>
+      <div class="slot"></div>
+      <div class="qticket" id="q-ticket">
+        Bundesamt für Älterwerden
+        <div class="nr">57</div>
+        Wartende vor Ihnen: 18<br>
+        <small>Geschätzte Wartezeit: 57 Jahre<br>Bitte Ticket nicht knicken.</small>
+      </div>
+    </div>
+    <div class="qactions" id="q-actions"></div>
+  </div>
+
+  <div class="stage" id="st-env">
+    <div class="lbl">Schalter 3 · Eingeschriebene Sendung</div>
+    <div class="env-wrap" id="env">
+      <div class="env-face" id="env-front">
+        <div class="rlabel"><b>R</b><span>Einschreiben<span class="mono">RR 057 057 057 CH</span></span></div>
+        <div class="pstamp"><div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg>57</div></div>
+        <div class="postmark">BAfÄ BERN<br><span class="pm-date"></span></div>
+        <div class="window">Herrn<br><span class="ink">Papa</span><br>Persönlich zu Handen</div>
+        <div class="confid">Vertraulich</div>
+      </div>
+      <div class="env-face" id="env-back">
+        <div class="eb-base"></div>
+        <div class="eb-letter"><span class="lbl">Bundesamt für Älterwerden</span><b>Amtliche Altersbescheinigung</b><br>Formular 57-B (Vintage-Ausführung)</div>
+        <div class="eb-pocket"></div>
+        <div class="eb-flap"></div>
+      </div>
+    </div>
+    <div class="env-tip" id="env-tip">Bitte Empfang quittieren: Umschlag antippen.</div>
+  </div>
+</section>
 
 <!-- Fake federal certificate: he signs, it gets stamped, the F1 section unlocks. -->
 <section class="cert-wrap">
@@ -438,6 +642,97 @@ $("#sign").addEventListener("click", () => {
   setTimeout(() => confetti(), 250);
   $("#f1").classList.add("open");
   setTimeout(() => $("#f1").scrollIntoView(), 1800);
+});
+
+/* ---------- Intro: pickup notice → pull a number → open the registered letter → certificate ---------- */
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const goStage = (id) => {
+  document.querySelectorAll(".stage").forEach((st) => st.classList.toggle("on", st.id === id));
+  scrollTo(0, 0);
+};
+$(".pm-date").textContent = now.toLocaleDateString("de-CH", { day: "2-digit", month: "2-digit", year: "2-digit" });
+
+// Random-width bars, so the tracking barcode looks real enough.
+$("#barcode").innerHTML = (() => {
+  let x = 0, bars = "";
+  while (x < 126) {
+    const w = 1 + Math.floor(Math.random() * 3);
+    bars += `<rect x="${x}" width="${w}" height="40" fill="#1d2433"/>`;
+    x += w + 1 + Math.floor(Math.random() * 3);
+  }
+  return bars;
+})();
+$("#barcode").setAttribute("viewBox", "0 0 130 40");
+
+$("#pickup").addEventListener("click", () => goStage("st-queue"));
+
+// Two-tone counter chime. The AudioContext is created on the tap itself so mobile browsers allow it.
+let audio = null;
+const ding = () => {
+  if (!audio) return;
+  [880, 660].forEach((f, i) => {
+    const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * 0.35;
+    o.frequency.value = f; o.connect(g); g.connect(audio.destination);
+    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+    o.start(t); o.stop(t + 0.6);
+  });
+};
+
+// The board crawls up to 57, stalling for bureaucratic reasons unless he jumps the queue.
+const stalls = { 41: "Schalter 3 macht Kaffeepause.", 47: "Sachbearbeiter sucht den Stempel …", 53: "Systemabsturz. Bitte warten." };
+$("#pull").addEventListener("click", async () => {
+  try { audio = new AudioContext(); } catch {}
+  $("#pull").disabled = true;
+  $("#q-ticket").classList.add("out");
+  await wait(1500);
+  let jumped = false;
+  $("#q-msg").textContent = "Bitte warten Sie, bis Ihre Nummer aufgerufen wird.";
+  $("#q-actions").innerHTML = '<button class="btn ghost" id="q-cut">Vordrängeln</button>';
+  $("#q-cut").onclick = () => {
+    jumped = true;
+    $("#q-actions").innerHTML = "";
+    $("#q-msg").textContent = "Vordrängeln wurde notiert. Busse: 1 Gin & Tonic.";
+  };
+  for (let n = 39; n <= 57; n++) {
+    $("#q-now").textContent = n;
+    if (!jumped && stalls[n]) {
+      $("#q-msg").textContent = stalls[n];
+      await wait(1400);
+      if (!jumped) $("#q-msg").textContent = "Bitte warten Sie …";
+    }
+    await wait(jumped ? 40 : 160);
+  }
+  $("#q-now").classList.add("blink");
+  $("#q-desk").textContent = "3";
+  ding();
+  $("#q-msg").innerHTML = "<b>Nummer 57 bitte an Schalter 3.</b>";
+  $("#q-actions").innerHTML = '<button class="btn" id="q-go">Zum Schalter 3 →</button>';
+  $("#q-go").onclick = () => goStage("st-env");
+});
+
+// First tap flips the envelope over, second tap opens it and hands over to the certificate.
+let envStep = 0;
+$("#env").addEventListener("click", async () => {
+  if (envStep === 0) {
+    envStep = 1;
+    await $("#env-front").animate([{ transform: "rotateY(0)" }, { transform: "rotateY(90deg)" }], { duration: 220, easing: "ease-in" }).finished;
+    $("#env-front").style.display = "none";
+    $("#env-back").style.display = "block";
+    $("#env-back").animate([{ transform: "rotateY(-90deg)" }, { transform: "rotateY(0)" }], { duration: 220, easing: "ease-out" });
+    $("#env-tip").textContent = "Nochmals antippen zum Öffnen.";
+  } else if (envStep === 1) {
+    envStep = 2;
+    $("#env").classList.add("open");
+    $("#env-tip").textContent = "Empfang quittiert. Quittung archiviert (Aufbewahrungsfrist: 57 Jahre).";
+    await wait(2300);
+    $("#intro").classList.add("leaving");
+    await wait(500);
+    document.body.classList.remove("intro-on");
+    $("#intro").remove();
+    $(".cert-wrap").classList.add("arrive");
+    sizePad(); // the pad had no size while hidden behind the intro
+    scrollTo(0, 0);
+  }
 });
 
 /* ---------- F1 lights out ---------- */
