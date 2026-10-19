@@ -207,15 +207,25 @@
   }
   footer .bye { font-family: "Caveat", cursive; font-size: clamp(38px, 10vw, 60px); line-height: 1.1; }
   footer p { opacity: .85; margin: 8px 0 18px; }
+  /* Never receives pointer events, so no tilt or bounce can ever let a click land. */
   #bug {
     font: 600 14px "Titillium Web", sans-serif; background: #fff; color: var(--red);
-    border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer;
-    z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none;
+    border: 0; border-radius: 999px; padding: 10px 16px; pointer-events: none;
+    display: inline-flex; align-items: center; gap: 6px; z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,.18);
+    transition: left .08s ease-out, top .08s ease-out, rotate .25s ease-out;
   }
+  #bug .icon { width: 16px; height: 16px; }
+  #bug.run .icon { animation: scurry .1s linear infinite alternate; }
+  #bug.dash { transition: left .45s cubic-bezier(.34,1.56,.64,1), top .45s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes scurry { from { rotate: -18deg; translate: 0 -1px; } to { rotate: 18deg; translate: 0 1px; } }
   /* The button's playground: it starts centred and flees anywhere inside. */
   .bug-arena { position: relative; height: 200px; display: grid; place-items: center; }
   #ticket { min-height: 1.4em; font-size: 14px; }
 
+  .icon { width: 1.1em; height: 1.1em; vertical-align: -.2em; flex: none; }
+  footer p .icon { fill: currentColor; }
+  .pb { color: #a855f7; font-weight: 700; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 </style>
 </head>
@@ -266,7 +276,7 @@
       <div class="sig">
         <div class="sig-pad" id="pad">
           <canvas></canvas>
-          <div class="hint">Hier unterschreiben ✍️</div>
+          <div class="hint"><span><i data-icon="signature"></i> Hier unterschreiben</span></div>
         </div>
         <label>Unterschrift des Jubilars</label>
       </div>
@@ -326,13 +336,26 @@
 
 <footer>
   <div class="bye">Alles Gute zum 57., Papa!</div>
-  <p>❤️ Bastian</p>
+  <p><i data-icon="heart"></i> Bastian</p>
   <div id="ticket"></div>
-  <div class="bug-arena"><button id="bug" tabindex="-1">🐞 Fehler melden</button></div>
+  <div class="bug-arena"><button id="bug" tabindex="-1"><i data-icon="bug"></i> Fehler melden</button></div>
 </footer>
 
 <script>
 const $ = (s) => document.querySelector(s);
+
+// Lucide icons (lucide-static v1.59.0, ISC), inlined. icon(name) returns SVG markup; <i data-icon="name"> is swapped on load.
+const ICONS = {
+  signature: '<path d="m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284"/><path d="M3 21h18"/>',
+  heart: '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/>',
+  bug: '<path d="M12 20v-9"/><path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"/><path d="M14.12 3.88 16 2"/><path d="M21 21a4 4 0 0 0-3.81-4"/><path d="M21 5a4 4 0 0 1-3.55 3.97"/><path d="M22 13h-4"/><path d="M3 21a4 4 0 0 1 3.81-4"/><path d="M3 5a4 4 0 0 0 3.55 3.97"/><path d="M6 13H2"/><path d="m8 2 1.88 1.88"/><path d="M9 7.13V6a3 3 0 1 1 6 0v1.13"/>',
+  "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  trophy: '<path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"/><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"/><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"/>',
+  annoyed: '<path d="M14 10h2"/><path d="M8 10h2"/><path d="M8 16h8"/><circle cx="12" cy="12" r="10"/>',
+};
+const icon = (name) =>
+  `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+document.querySelectorAll("i[data-icon]").forEach((el) => (el.outerHTML = icon(el.dataset.icon)));
 const now = new Date();
 document.querySelectorAll(".year").forEach((el) => (el.textContent = String(now.getFullYear())));
 $(".today").textContent = now.toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" });
@@ -401,12 +424,12 @@ $("#clear").addEventListener("click", () => {
 });
 
 const bureaucracy = [
-  "⚠️ Formular unvollständig: Unterschrift fehlt. Bitte am Schalter 3 eine Nummer ziehen.",
-  "⚠️ Das ist keine Unterschrift, das ist ein Pünktchen. Das Amt braucht etwas mehr Eindruck.",
+  "Formular unvollständig: Unterschrift fehlt. Bitte am Schalter 3 eine Nummer ziehen.",
+  "Das ist keine Unterschrift, das ist ein Pünktchen. Das Amt braucht etwas mehr Eindruck.",
 ];
 $("#sign").addEventListener("click", () => {
   if (stamped) { $("#f1").scrollIntoView(); return; }
-  if (inkLength < 60) { $("#err").textContent = bureaucracy[inkLength ? 1 : 0]; return; }
+  if (inkLength < 60) { $("#err").innerHTML = `${icon("triangle-alert")} ${bureaucracy[inkLength ? 1 : 0]}`; return; }
   stamped = true;
   $("#err").textContent = "";
   $("#stamp").classList.add("on");
@@ -456,8 +479,9 @@ const start = () => {
   phase = "lighting";
   show("&nbsp;", "Bereit machen…", "");
   for (let i = 1; i <= 5; i++) timers.push(setTimeout(() => setLit(i), i * 1000));
-  const hold = 5000 + 200 + Math.random() * 2800;
-  timers.push(setTimeout(() => { setLit(0); outAt = performance.now(); phase = "armed"; }, hold));
+  // Like F1: once all five are lit, they go out after a random hold, fresh every start.
+  const hold = 200 + Math.random() * 2800;
+  timers.push(setTimeout(() => { setLit(0); outAt = performance.now(); phase = "armed"; }, 5000 + hold));
 };
 
 const hit = () => {
@@ -473,7 +497,7 @@ const hit = () => {
   $("#last").textContent = fmt(ms);
   const isBest = !best || ms < best;
   if (isBest) { best = ms; localStorage.setItem("papa57-best", String(ms)); $("#best").textContent = fmt(ms); }
-  show(fmt(ms) + " s", verdict, isBest ? "🟣 Persönliche Bestzeit! · Tippen für einen neuen Versuch" : "Tippen für einen neuen Versuch");
+  show(fmt(ms) + " s", verdict, isBest ? `<span class="pb">${icon("trophy")} Persönliche Bestzeit!</span> · Tippen für einen neuen Versuch` : "Tippen für einen neuen Versuch");
   if (ms < 300) confetti(80);
 };
 
@@ -513,7 +537,7 @@ const jokes = [
   ["Warum gehen Ameisen nicht in die Kirche?", "Weil sie in Sekten sind."],
   ["Was macht ein Mathematiker im Garten?", "Wurzeln ziehen."],
 ];
-const groans = ["Groan-Meter: 🙄", "Groan-Meter: 🙄🙄", "Groan-Meter: 🙄🙄🙄", "Groan-Meter: 🙄🙄🙄🙄 – Familie verlässt den Tisch"];
+const groans = [1, 2, 3, 4].map((n) => `Groan-Meter: ${icon("annoyed").repeat(n)}${n === 4 ? " – Familie verlässt den Tisch" : ""}`);
 let jokeIdx = Math.floor(Math.random() * jokes.length);
 let told = 0;
 const card = $("#joke");
@@ -527,12 +551,12 @@ const nextJoke = () => {
 card.addEventListener("click", () => {
   if (card.classList.contains("revealed")) return;
   card.classList.add("revealed");
-  $("#groan").textContent = groans[Math.min(told++, groans.length - 1)];
+  $("#groan").innerHTML = groans[Math.min(told++, groans.length - 1)];
 });
 $("#next").addEventListener("click", nextJoke);
 nextJoke();
 
-/* ---------- "Fehler melden": stays a hair's breadth ahead of the cursor or finger. Clicking does nothing useful. ---------- */
+/* ---------- "Fehler melden": stays a hair's breadth ahead of the cursor or finger, leaning and scurrying as it goes. ---------- */
 const bug = $("#bug");
 const arena = $(".bug-arena");
 const taunts = [
@@ -548,42 +572,70 @@ let attempts = 0;
 const taunt = () => ($("#ticket").textContent = taunts[attempts++ % taunts.length]);
 const PAD = 4; // keep this far from the arena edges
 
-// Current button box in arena coordinates; switches it to absolute positioning on first use.
-const box = () => {
-  const a = arena.getBoundingClientRect();
-  const b = bug.getBoundingClientRect();
-  const r = { x: b.left - a.left, y: b.top - a.top, w: b.width, h: b.height, aw: a.width, ah: a.height };
-  if (bug.style.position !== "absolute") Object.assign(bug.style, { position: "absolute", left: `${r.x}px`, top: `${r.y}px` });
-  return r;
+// Target top-left in arena coordinates. Tracked here because the rendered position lags behind its transition.
+let pos = null;
+const size = () => ({ w: bug.offsetWidth, h: bug.offsetHeight, aw: arena.clientWidth, ah: arena.clientHeight });
+const place = (x, y) => { pos = { x, y }; bug.style.left = `${x}px`; bug.style.top = `${y}px`; };
+const ensurePos = () => {
+  if (pos) return pos;
+  const x = bug.offsetLeft, y = bug.offsetTop;
+  bug.style.position = "absolute";
+  place(x, y);
+  bug.offsetWidth; // commit the start position so the first move animates
+  return pos;
 };
-const moveTo = (x, y) => { bug.style.left = `${x}px`; bug.style.top = `${y}px`; };
-const fits = (r, x, y) => x >= PAD && y >= PAD && x + r.w <= r.aw - PAD && y + r.h <= r.ah - PAD;
 
-// Cornered: teleport to the far side of the arena.
-const escape = (r, px, py) => {
-  moveTo(px < r.aw / 2 ? r.aw - r.w - PAD : PAD, py < r.ah / 2 ? r.ah - r.h - PAD : PAD);
+// Lean into the direction of travel and wiggle the bug's legs; settle back once it stops.
+let settle = 0;
+const lean = (dx, dy) => {
+  bug.style.rotate = `${Math.max(-14, Math.min(14, dx * 2.5 + dy))}deg`;
+  bug.classList.add("run");
+  clearTimeout(settle);
+  settle = setTimeout(() => { bug.style.rotate = "0deg"; bug.classList.remove("run"); }, 180);
+};
+
+// Big moves (hopping over the cursor, fleeing a corner) get a springy dash with a spin and a taunt.
+const hop = (x, y) => {
+  place(x, y);
+  bug.classList.add("dash");
+  setTimeout(() => bug.classList.remove("dash"), 450);
+  bug.animate(
+    [{ rotate: "0deg", scale: 1 }, { rotate: "200deg", scale: 0.7, offset: 0.45 }, { rotate: "360deg", scale: 1.15, offset: 0.8 }, { rotate: "360deg", scale: 1 }],
+    { duration: 450, easing: "ease-out" },
+  );
   taunt();
+};
+const escape = (px, py) => {
+  const { w, h, aw, ah } = size();
+  hop(px < aw / 2 ? aw - w - PAD : PAD, py < ah / 2 ? ah - h - PAD : PAD);
 };
 
 // Push the button the shortest way so (px, py) ends up `gap` px outside it. Runs on every move.
+const gapTo = (px, py) => {
+  const { x, y } = ensurePos();
+  const { w, h } = size();
+  return Math.hypot(Math.max(x - px, 0, px - (x + w)), Math.max(y - py, 0, py - (y + h)));
+};
 const dodge = (clientX, clientY, gap) => {
-  const r = box();
   const a = arena.getBoundingClientRect();
   const px = clientX - a.left;
   const py = clientY - a.top;
-  const ox = Math.max(r.x - px, 0, px - (r.x + r.w));
-  const oy = Math.max(r.y - py, 0, py - (r.y + r.h));
-  if (Math.hypot(ox, oy) >= gap) return;
+  if (gapTo(px, py) >= gap) return;
+  const { x, y } = pos;
+  const { w, h, aw, ah } = size();
+  const fits = ([nx, ny]) => nx >= PAD && ny >= PAD && nx + w <= aw - PAD && ny + h <= ah - PAD;
   const options = [
-    [px + gap, r.y], // to the right
-    [px - gap - r.w, r.y], // to the left
-    [r.x, py + gap], // below
-    [r.x, py - gap - r.h], // above
-  ].filter(([x, y]) => fits(r, x, y));
-  if (!options.length) return escape(r, px, py);
-  const [x, y] = options.reduce((best, o) =>
-    Math.hypot(o[0] - r.x, o[1] - r.y) < Math.hypot(best[0] - r.x, best[1] - r.y) ? o : best);
-  moveTo(x, y);
+    [px + gap, y], // to the right
+    [px - gap - w, y], // to the left
+    [x, py + gap], // below
+    [x, py - gap - h], // above
+  ].filter(fits);
+  if (!options.length) return escape(px, py);
+  const [nx, ny] = options.reduce((best, o) =>
+    Math.hypot(o[0] - x, o[1] - y) < Math.hypot(best[0] - x, best[1] - y) ? o : best);
+  if (Math.hypot(nx - x, ny - y) > 20) return hop(nx, ny);
+  lean(nx - x, ny - y);
+  place(nx, ny);
 };
 
 const footer = $("footer");
@@ -591,15 +643,14 @@ footer.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") d
 // Touch has no hover: dodge where the finger lands and keep dodging while it slides. Only block scrolling near the button.
 const onTouch = (e) => {
   const t = e.touches[0];
-  const b = bug.getBoundingClientRect();
-  if (Math.hypot(Math.max(b.left - t.clientX, 0, t.clientX - b.right), Math.max(b.top - t.clientY, 0, t.clientY - b.bottom)) > 60) return;
+  const a = arena.getBoundingClientRect();
+  if (gapTo(t.clientX - a.left, t.clientY - a.top) > 60) return;
   e.preventDefault();
   dodge(t.clientX, t.clientY, 18);
 };
 footer.addEventListener("touchstart", onTouch, { passive: false });
 footer.addEventListener("touchmove", onTouch, { passive: false });
-bug.addEventListener("click", (e) => { e.preventDefault(); escape(box(), e.clientX - arena.getBoundingClientRect().left, e.clientY - arena.getBoundingClientRect().top); });
-addEventListener("resize", () => { bug.style.position = ""; });
+addEventListener("resize", () => { pos = null; bug.style.position = ""; });
 </script>
 </body>
 </html>
