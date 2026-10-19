@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amtliche Altersbescheinigung – Papa 57</title>
+<meta name="description" content="Bundesamt für Älterwerden: Papa ist offiziell 57.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23d52b1e'/><path d='M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Titillium+Web:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #d52b1e;
+    --ink: #1d2433;
+    --paper: #fbf8f1;
+    --muted: #6b6f7a;
+    --stamp: #1f4fa8;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "IBM Plex Serif", Georgia, serif;
+    color: var(--ink);
+    background: #e9e4d8;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- Certificate ---------- */
+  .cert-wrap { padding: 24px 12px 48px; }
+  .cert {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    background:
+      repeating-radial-gradient(circle at 0 0, transparent 0 14px, rgba(213,43,30,.035) 14px 15px),
+      repeating-radial-gradient(circle at 100% 100%, transparent 0 14px, rgba(31,79,168,.035) 14px 15px),
+      var(--paper);
+    border: 1px solid #d8d0bd;
+    box-shadow: 0 1px 0 #fff inset, 0 20px 50px rgba(40,30,10,.18);
+    padding: 28px 22px 32px;
+  }
+  .cert::before {
+    content: ""; position: absolute; inset: 8px;
+    border: 2px double rgba(213,43,30,.35); pointer-events: none;
+  }
+  .fed {
+    display: flex; gap: 12px; align-items: center;
+    font-family: "Titillium Web", system-ui, sans-serif;
+    font-size: 12px; line-height: 1.35; color: #333;
+    border-bottom: 1px solid #ddd3bf; padding-bottom: 14px;
+  }
+  .flag { width: 34px; height: 34px; flex: none; }
+  .fed b { display: block; font-size: 13px; }
+  .formno {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px;
+    font-family: "Titillium Web", sans-serif; font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .08em; margin-top: 10px;
+  }
+  h1 {
+    font-weight: 600; font-size: clamp(26px, 6vw, 38px);
+    text-align: center; margin: 26px 0 4px; letter-spacing: .01em;
+  }
+  .sub { text-align: center; color: var(--muted); font-style: italic; margin: 0 0 24px; }
+  .lead { font-size: 17px; line-height: 1.6; text-align: center; margin: 0; }
+  .name {
+    font-family: "Caveat", cursive; font-size: clamp(56px, 16vw, 92px);
+    line-height: 1; text-align: center; margin: 10px 0 6px; color: #12306e;
+  }
+  .lead strong { color: var(--red); }
+
+  .findings { width: 100%; border-collapse: collapse; margin: 26px 0 8px; font-size: 15px; }
+  .findings caption {
+    text-align: left; font-family: "Titillium Web", sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--muted);
+    padding-bottom: 6px;
+  }
+  .findings th, .findings td { text-align: left; vertical-align: top; padding: 9px 6px; border-top: 1px solid #e3dbc8; }
+  .findings th { width: 34%; font-weight: 600; }
+  .findings td small { color: var(--muted); }
+  .ok::before { content: "☑ "; color: #1b7d3a; }
+
+  .fine {
+    font-size: 12px; line-height: 1.5; color: var(--muted);
+    border: 1px dashed #cfc5ae; padding: 10px 12px; margin-top: 18px;
+  }
+  .fine b { color: var(--ink); }
+
+  .sigs { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 26px; }
+  @media (min-width: 620px) { .sigs { grid-template-columns: 1fr 1fr; } .cert { padding: 40px 48px 44px; } }
+  .sig label {
+    display: block; font-family: "Titillium Web", sans-serif; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 6px;
+  }
+  .sig-pad {
+    position: relative; height: 110px; border-bottom: 1.5px solid var(--ink);
+    background: rgba(255,255,255,.55); touch-action: none; cursor: crosshair;
+  }
+  .sig-pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .sig-pad .hint {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    color: #b7ae99; font-style: italic; pointer-events: none; transition: opacity .2s;
+  }
+  .sig-pad.dirty .hint { opacity: 0; }
+  .sig-official {
+    height: 110px; border-bottom: 1.5px solid var(--ink); display: flex; align-items: flex-end;
+    font-family: "Caveat", cursive; font-size: 30px; color: #12306e; padding: 0 6px 6px;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 22px; }
+  .btn {
+    font: 700 16px "Titillium Web", sans-serif; letter-spacing: .03em;
+    border: 0; border-radius: 4px; padding: 13px 20px; cursor: pointer;
+    background: var(--red); color: #fff; box-shadow: 0 3px 0 #8f1c13;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8f1c13; }
+  .btn.ghost { background: transparent; color: var(--muted); box-shadow: none; font-weight: 400; padding: 13px 8px; }
+  .err { color: var(--red); font-size: 14px; min-height: 1.2em; margin: 10px 0 0; }
+
+  .stamp {
+    position: absolute; right: 6%; bottom: 120px; width: 190px; height: 190px;
+    border: 6px double var(--stamp); border-radius: 50%;
+    color: var(--stamp); display: grid; place-items: center; text-align: center;
+    font: 900 15px/1.1 "Titillium Web", sans-serif; letter-spacing: .1em; text-transform: uppercase;
+    opacity: 0; transform: rotate(-14deg) scale(3); pointer-events: none;
+    mix-blend-mode: multiply;
+    -webkit-mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgba(0,0,0,.75) 75%, #000 90%);
+  }
+  .stamp big { display: block; font-size: 54px; line-height: .95; letter-spacing: 0; }
+  .stamp.on { animation: thump .45s cubic-bezier(.2,.9,.3,1.2) forwards; }
+  @keyframes thump {
+    0% { opacity: 0; transform: rotate(-14deg) scale(3); }
+    70% { opacity: .9; transform: rotate(-14deg) scale(.92); }
+    100% { opacity: .85; transform: rotate(-14deg) scale(1); }
+  }
+  .cert.shake { animation: shake .3s .3s; }
+  @keyframes shake { 25% { transform: translate(2px, 3px); } 50% { transform: translate(-3px, -1px); } 75% { transform: translate(1px, 2px); } }
+
+  /* ---------- F1 section ---------- */
+  .f1 {
+    display: none;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.03) 25%, transparent 25%) 0 0/8px 8px,
+      linear-gradient(225deg, rgba(255,255,255,.03) 25%, transparent 25%) 0 0/8px 8px,
+      #121318;
+    color: #f2f2f2; font-family: "Titillium Web", system-ui, sans-serif;
+    padding: 48px 16px 56px;
+  }
+  .f1.open { display: block; }
+  .f1-inner { max-width: 760px; margin: 0 auto; }
+  .kicker { color: #e10600; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; font-size: 12px; }
+  .f1 h2 { font-size: clamp(28px, 7vw, 44px); font-weight: 900; line-height: 1.05; margin: 6px 0 10px; text-transform: uppercase; font-style: italic; }
+  .f1 p { color: #b9bcc6; line-height: 1.5; margin: 0 0 20px; }
+  .track {
+    position: relative; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+    background: #1c1e25; border: 1px solid #2c2f39; border-radius: 10px;
+    padding: 26px 12px 22px; cursor: pointer; outline: none;
+  }
+  .gantry { display: flex; justify-content: center; gap: clamp(6px, 2.5vw, 16px); }
+  .pod {
+    background: #0a0a0c; border-radius: 8px; padding: 8px; display: grid; gap: 8px;
+    box-shadow: inset 0 0 0 2px #24262e;
+  }
+  .lamp {
+    width: clamp(34px, 11vw, 58px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #3a1414, #1a0606 70%);
+    box-shadow: inset 0 0 6px #000;
+  }
+  .pod.lit .lamp {
+    background: radial-gradient(circle at 35% 35%, #ff8a80, #ff1a0d 45%, #b00000 80%);
+    box-shadow: 0 0 22px 4px rgba(255,30,10,.6), inset 0 0 4px rgba(255,255,255,.3);
+  }
+  .status { text-align: center; margin-top: 22px; min-height: 92px; }
+  .status .big { font-size: clamp(40px, 12vw, 72px); font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+  .status .verdict { font-size: 18px; color: #f2f2f2; margin-top: 8px; }
+  .status .tip { color: #8d909b; font-size: 14px; margin-top: 6px; }
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .cell { background: #1c1e25; border: 1px solid #2c2f39; border-radius: 8px; padding: 12px; }
+  .cell span { display: block; font-size: 11px; color: #8d909b; text-transform: uppercase; letter-spacing: .1em; }
+  .cell b { font-size: 22px; font-variant-numeric: tabular-nums; }
+  .cell.best b { color: #a855f7; } /* F1 purple sector */
+
+  /* ---------- Jokes + footer ---------- */
+  .jokes { background: #fbf8f1; padding: 48px 16px; }
+  .jokes-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+  .jokes h2 { font-size: clamp(24px, 6vw, 34px); margin: 0 0 6px; }
+  .jokes .muted { color: var(--muted); margin: 0 0 22px; }
+  .card {
+    background: #fff; border: 1px solid #e3dbc8; border-radius: 10px; padding: 26px 20px;
+    min-height: 170px; display: grid; place-items: center; cursor: pointer;
+    box-shadow: 0 10px 30px rgba(40,30,10,.08);
+  }
+  .card .q { font-size: 21px; line-height: 1.4; }
+  .card .a { font-family: "Caveat", cursive; font-size: 34px; color: var(--red); margin-top: 12px; display: none; }
+  .card.revealed .a { display: block; animation: pop .3s; }
+  .card .tap { color: #b7ae99; font-size: 13px; margin-top: 10px; }
+  .card.revealed .tap { display: none; }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } }
+  .groan { margin-top: 14px; color: var(--muted); font-size: 14px; }
+
+  footer {
+    background: var(--red); color: #fff; text-align: center; padding: 40px 16px 24px;
+    font-family: "Titillium Web", sans-serif; position: relative; overflow: hidden;
+  }
+  footer .bye { font-family: "Caveat", cursive; font-size: clamp(38px, 10vw, 60px); line-height: 1.1; }
+  footer p { opacity: .85; margin: 8px 0 18px; }
+  #bug {
+    font: 600 14px "Titillium Web", sans-serif; background: #fff; color: var(--red);
+    border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer;
+    z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  /* The button's playground: it starts centred and flees anywhere inside. */
+  .bug-arena { position: relative; height: 200px; display: grid; place-items: center; }
+  #ticket { min-height: 1.4em; font-size: 14px; }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<!-- Fake federal certificate: he signs, it gets stamped, the F1 section unlocks. -->
+<section class="cert-wrap">
+  <article class="cert" id="cert">
+    <header class="fed">
+      <svg class="flag" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#d52b1e"/><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg>
+      <div>
+        <b>Schweizerische Eidgenossenschaft</b>
+        Confédération suisse · Confederazione Svizzera<br>
+        Bundesamt für Älterwerden BAfÄ
+      </div>
+    </header>
+    <div class="formno">
+      <span>Formular 57-B (Vintage-Ausführung)</span>
+      <span>Geschäftsnummer BAfÄ-57/<span class="year"></span></span>
+    </div>
+
+    <h1>Amtliche Altersbescheinigung</h1>
+    <p class="sub">ausgestellt am <span class="today"></span>, Schalter 3</p>
+
+    <p class="lead">Hiermit wird amtlich bestätigt, dass</p>
+    <div class="name">Papa</div>
+    <p class="lead">heute seinen <strong>57. Geburtstag</strong> feiert und somit offiziell als<br><strong>Vintage</strong> (noch kein Oldtimer) eingestuft wird.</p>
+
+    <table class="findings">
+      <caption>Erhobene Befunde</caption>
+      <tr><th class="ok">Taucher</th><td>Brevet gültig bis 57&nbsp;m Tiefe – ein Meter pro Jahr.<br><small>Ab nächstem Jahr bitte Trimix.</small></td></tr>
+      <tr><th class="ok">Töfffahrer</th><td>Ausweis Kat.&nbsp;A gültig. Lederkombi: passt noch (knapp).<br><small>Knie: bedingt kurventauglich.</small></td></tr>
+      <tr><th class="ok">F1-Experte</th><td>Weiss mehr über Reifenstrategie als die Ferrari-Box.<br><small>Anmerkung des Amtes: Das ist keine Kunst.</small></td></tr>
+      <tr><th class="ok">Chef-Tester</th><td>Offiziell zuständig für alle Apps von Bastian.<br><small>Standard-Fehlermeldung: «Das geht nicht. Fix das.»</small></td></tr>
+      <tr><th class="ok">Papa-Witz-Lizenz</th><td>Abgelaufen 1998. Wird trotzdem täglich verwendet.<br><small>Wird vom Amt geduldet.</small></td></tr>
+      <tr><th class="ok">Herzschläge bis heute</th><td>ca. 2'100'000'000 – alle noch funktionstüchtig.</td></tr>
+    </table>
+
+    <div class="fine">
+      <b>Rechtsmittelbelehrung:</b> Gegen diese Verfügung kann innert 57 Tagen schriftlich Einsprache erhoben werden.
+      Einsprachen werden gesammelt, abgelegt und im Jahr 2083 behandelt. Bearbeitungsgebühr: 1 Gin &amp; Tonic.
+      Diese Bescheinigung ist nur mit Unterschrift des Jubilars und amtlichem Stempel gültig.
+    </div>
+
+    <div class="sigs">
+      <div class="sig">
+        <div class="sig-pad" id="pad">
+          <canvas></canvas>
+          <div class="hint">Hier unterschreiben ✍️</div>
+        </div>
+        <label>Unterschrift des Jubilars</label>
+      </div>
+      <div class="sig">
+        <div class="sig-official">i.A. Bastian</div>
+        <label>Sachbearbeiter Stufe 57, BAfÄ</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="sign">Unterschreiben &amp; abstempeln</button>
+      <button class="btn ghost" id="clear">Nochmals von vorne</button>
+    </div>
+    <p class="err" id="err" role="alert"></p>
+
+    <div class="stamp" id="stamp"><div>Bewilligt<big>57</big>BAfÄ · <span class="year"></span></div></div>
+  </article>
+</section>
+
+<!-- F1 lights-out reaction test. Five lamps light one per second, then go out after a random hold. -->
+<section class="f1" id="f1">
+  <div class="f1-inner">
+    <div class="kicker">Verordnung 57-F1 · Obligatorische Zusatzprüfung</div>
+    <h2>It's lights out<br>and away we go</h2>
+    <p>Alle Jubilare über 56 müssen einen Reaktionstest absolvieren. Sobald alle fünf Lampen ausgehen: so schnell wie möglich tippen. Zu früh = Fehlstart.</p>
+
+    <div class="track" id="track" tabindex="0" role="button" aria-label="Reaktionstest – tippen oder Leertaste">
+      <div class="gantry" id="gantry"></div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="board">
+      <div class="cell"><span>Letzte Runde</span><b id="last">–</b></div>
+      <div class="cell best"><span>Bestzeit Papa</span><b id="best">–</b></div>
+      <div class="cell"><span>F1-Fahrer Ø</span><b>0.200</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="jokes">
+  <div class="jokes-inner">
+    <h2>Der Papa-Witz-Automat</h2>
+    <p class="muted">Für den Fall, dass der eigene Vorrat einmal ausgeht.</p>
+    <div class="card" id="joke">
+      <div>
+        <div class="q"></div>
+        <div class="a"></div>
+        <div class="tap">tippen für die Pointe</div>
+      </div>
+    </div>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" id="next">Noch einer!</button>
+    </div>
+    <div class="groan" id="groan"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="bye">Alles Gute zum 57., Papa!</div>
+  <p>❤️ Bastian</p>
+  <div id="ticket"></div>
+  <div class="bug-arena"><button id="bug" tabindex="-1">🐞 Fehler melden</button></div>
+</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const now = new Date();
+document.querySelectorAll(".year").forEach((el) => (el.textContent = String(now.getFullYear())));
+$(".today").textContent = now.toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" });
+
+/* ---------- Confetti: burst(n) throws n Swiss-red/white/F1 pieces from the top. ---------- */
+const confetti = (() => {
+  const cv = $("#confetti");
+  const ctx = cv.getContext("2d");
+  const colors = ["#d52b1e", "#ffffff", "#1f4fa8", "#ffd400", "#a855f7"];
+  let parts = [];
+  let raf = 0;
+  const resize = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; };
+  addEventListener("resize", resize); resize();
+  const tick = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter((p) => p.y < cv.height + 20);
+    for (const p of parts) {
+      p.vy += 0.12 * devicePixelRatio; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+      ctx.restore();
+    }
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+  };
+  return (n = 160) => {
+    for (let i = 0; i < n; i++) {
+      parts.push({
+        x: Math.random() * cv.width, y: -Math.random() * cv.height * 0.3,
+        vx: (Math.random() - 0.5) * 4 * devicePixelRatio, vy: Math.random() * 3 * devicePixelRatio,
+        r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3,
+        s: (6 + Math.random() * 8) * devicePixelRatio, c: colors[i % colors.length],
+      });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  };
+})();
+
+/* ---------- Signature pad ---------- */
+const pad = $("#pad");
+const sigCanvas = pad.querySelector("canvas");
+const sig = sigCanvas.getContext("2d");
+let inkLength = 0;
+let lastPt = null;
+const sizePad = () => {
+  const r = pad.getBoundingClientRect();
+  sigCanvas.width = r.width * devicePixelRatio; sigCanvas.height = r.height * devicePixelRatio;
+  sig.scale(devicePixelRatio, devicePixelRatio);
+  sig.lineWidth = 2.4; sig.lineCap = "round"; sig.lineJoin = "round"; sig.strokeStyle = "#12306e";
+};
+sizePad();
+const pt = (e) => { const r = pad.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+pad.addEventListener("pointerdown", (e) => { pad.setPointerCapture(e.pointerId); lastPt = pt(e); });
+pad.addEventListener("pointermove", (e) => {
+  if (!lastPt) return;
+  const p = pt(e);
+  sig.beginPath(); sig.moveTo(lastPt.x, lastPt.y); sig.lineTo(p.x, p.y); sig.stroke();
+  inkLength += Math.hypot(p.x - lastPt.x, p.y - lastPt.y);
+  lastPt = p; pad.classList.add("dirty");
+});
+["pointerup", "pointercancel"].forEach((t) => pad.addEventListener(t, () => (lastPt = null)));
+
+let stamped = false;
+$("#clear").addEventListener("click", () => {
+  if (stamped) { $("#err").textContent = "Abgestempelt ist abgestempelt. Für Änderungen bitte Formular 57-C anfordern."; return; }
+  sig.clearRect(0, 0, sigCanvas.width, sigCanvas.height); inkLength = 0; pad.classList.remove("dirty");
+});
+
+const bureaucracy = [
+  "⚠️ Formular unvollständig: Unterschrift fehlt. Bitte am Schalter 3 eine Nummer ziehen.",
+  "⚠️ Das ist keine Unterschrift, das ist ein Pünktchen. Das Amt braucht etwas mehr Eindruck.",
+];
+$("#sign").addEventListener("click", () => {
+  if (stamped) { $("#f1").scrollIntoView(); return; }
+  if (inkLength < 60) { $("#err").textContent = bureaucracy[inkLength ? 1 : 0]; return; }
+  stamped = true;
+  $("#err").textContent = "";
+  $("#stamp").classList.add("on");
+  $("#cert").classList.add("shake");
+  $("#sign").textContent = "Weiter zur Zusatzprüfung →";
+  setTimeout(() => confetti(), 250);
+  $("#f1").classList.add("open");
+  setTimeout(() => $("#f1").scrollIntoView(), 1800);
+});
+
+/* ---------- F1 lights out ---------- */
+const gantry = $("#gantry");
+const pods = Array.from({ length: 5 }, () => {
+  const pod = document.createElement("div");
+  pod.className = "pod";
+  pod.innerHTML = '<div class="lamp"></div><div class="lamp"></div>';
+  gantry.append(pod);
+  return pod;
+});
+const status = $("#status");
+const show = (big, verdict = "", tip = "") => {
+  status.innerHTML = `<div class="big">${big}</div><div class="verdict">${verdict}</div><div class="tip">${tip}</div>`;
+};
+const verdicts = [
+  [150, "Unter 150 ms?! Entweder Weltrekord oder geraten. Das Amt prüft."],
+  [200, "Verstappen-Niveau. Ferrari will dich anstellen – bitte nicht zusagen."],
+  [250, "Echter F1-Reflex. Der Töff ist erleichtert."],
+  [300, "Stark! Schneller als das ABS deines Töffs."],
+  [400, "Solide. Wie Hamilton nach dem Ferrari-Wechsel."],
+  [550, "Taucher-Reaktionszeit: Auf 57 Metern geht halt alles etwas langsamer."],
+  [800, "Hast du noch schnell das WhatsApp fertig gelesen?"],
+  [Infinity, "Die Ampel ist schon lange grün, Papa. Hinten hupt einer."],
+];
+const fmt = (ms) => (ms / 1000).toFixed(3);
+let best = Number(localStorage.getItem("papa57-best")) || 0;
+if (best) $("#best").textContent = fmt(best);
+
+// phase: idle → lighting → armed (lights out, timing) → done/jump → idle
+let phase = "idle";
+let timers = [];
+let outAt = 0;
+const setLit = (n) => pods.forEach((p, i) => p.classList.toggle("lit", i < n));
+const reset = () => { timers.forEach(clearTimeout); timers = []; setLit(0); };
+
+const start = () => {
+  reset();
+  phase = "lighting";
+  show("&nbsp;", "Bereit machen…", "");
+  for (let i = 1; i <= 5; i++) timers.push(setTimeout(() => setLit(i), i * 1000));
+  const hold = 5000 + 200 + Math.random() * 2800;
+  timers.push(setTimeout(() => { setLit(0); outAt = performance.now(); phase = "armed"; }, hold));
+};
+
+const hit = () => {
+  if (phase === "idle" || phase === "done") return start();
+  if (phase === "lighting") {
+    reset(); phase = "done";
+    show("FEHLSTART", "5-Sekunden-Strafe. Die Rennkommissare haben das gesehen.", "Tippen für einen neuen Versuch");
+    return;
+  }
+  const ms = performance.now() - outAt;
+  phase = "done";
+  const [, verdict] = verdicts.find(([max]) => ms < max);
+  $("#last").textContent = fmt(ms);
+  const isBest = !best || ms < best;
+  if (isBest) { best = ms; localStorage.setItem("papa57-best", String(ms)); $("#best").textContent = fmt(ms); }
+  show(fmt(ms) + " s", verdict, isBest ? "🟣 Persönliche Bestzeit! · Tippen für einen neuen Versuch" : "Tippen für einen neuen Versuch");
+  if (ms < 300) confetti(80);
+};
+
+const track = $("#track");
+track.addEventListener("pointerdown", (e) => { e.preventDefault(); hit(); });
+addEventListener("keydown", (e) => {
+  if (e.code !== "Space" || !$("#f1").classList.contains("open")) return;
+  e.preventDefault(); hit();
+});
+show("START", "Auf die Ampel tippen zum Starten", "oder Leertaste");
+
+/* ---------- Dad jokes ---------- */
+const jokes = [
+  ["Warum fallen Taucher immer rückwärts ins Wasser?", "Weil sie sonst ins Boot fallen."],
+  ["Wie heisst ein Spanier ohne Auto?", "Carlos."],
+  ["Woran erkennt man einen glücklichen Töfffahrer?", "An den Mücken zwischen den Zähnen."],
+  ["Was haben ein Ferrari-Boxenstopp und ein Bundesamt gemeinsam?", "Beide dauern länger als geplant."],
+  ["Was ist grün und klopft an die Tür?", "Ein Klopfsalat."],
+  ["Was macht ein Pirat am Computer?", "Er drückt die Enter-Taste."],
+  ["Wie nennt man einen Bumerang, der nicht zurückkommt?", "Einen Stock."],
+  ["Was ist orange und läuft den Berg hinauf?", "Eine Wanderine."],
+  ["Wie heisst ein Fisch ohne Augen?", "Fsch."],
+  ["Was macht ein Clown im Büro?", "Faxen."],
+  ["Was ist ein Keks unter einem Baum?", "Ein schattiges Plätzchen."],
+  ["Treffen sich zwei Jäger.", "Beide tot."],
+  ["Was ist braun, klebrig und läuft durch die Wüste?", "Ein Karamel."],
+  ["Wie nennt man einen dicken Vegetarier?", "Biotonne."],
+  ["Was liegt am Strand und spricht undeutlich?", "Eine Nuschel."],
+  ["Warum können Seeräuber keinen Kreis berechnen?", "Weil sie Pi raten."],
+  ["Was ist weiss und stört beim Essen?", "Eine Lawine."],
+  ["Was sagt der grosse Stift zum kleinen Stift?", "Wachs mal, Stift."],
+  ["Wie heisst der Bruder von Elvis?", "Elzwo."],
+  ["Wo wohnen Katzen?", "Im Miezhaus."],
+  ["Was ist ein Cowboy ohne Pferd?", "Ein Sattelschlepper."],
+  ["Was ist ein Schaf ohne Beine?", "Eine Wolke."],
+  ["Welches Auto fährt ein Schaf?", "Einen Lamborghini."],
+  ["Warum gehen Ameisen nicht in die Kirche?", "Weil sie in Sekten sind."],
+  ["Was macht ein Mathematiker im Garten?", "Wurzeln ziehen."],
+];
+const groans = ["Groan-Meter: 🙄", "Groan-Meter: 🙄🙄", "Groan-Meter: 🙄🙄🙄", "Groan-Meter: 🙄🙄🙄🙄 – Familie verlässt den Tisch"];
+let jokeIdx = Math.floor(Math.random() * jokes.length);
+let told = 0;
+const card = $("#joke");
+const nextJoke = () => {
+  jokeIdx = (jokeIdx + 1) % jokes.length;
+  const [q, a] = jokes[jokeIdx];
+  card.querySelector(".q").textContent = q;
+  card.querySelector(".a").textContent = a;
+  card.classList.remove("revealed");
+};
+card.addEventListener("click", () => {
+  if (card.classList.contains("revealed")) return;
+  card.classList.add("revealed");
+  $("#groan").textContent = groans[Math.min(told++, groans.length - 1)];
+});
+$("#next").addEventListener("click", nextJoke);
+nextJoke();
+
+/* ---------- "Fehler melden": stays a hair's breadth ahead of the cursor or finger. Clicking does nothing useful. ---------- */
+const bug = $("#bug");
+const arena = $(".bug-arena");
+const taunts = [
+  "Fehler nicht reproduzierbar.",
+  "Status: «Bei mir geht's.»",
+  "Das ist kein Bug, das ist ein Feature.",
+  "Ticket als Duplikat geschlossen.",
+  "Bitte Cache leeren und nochmals versuchen.",
+  "Geschätzte Bearbeitungszeit: 57 Jahre.",
+  "Haben Sie es schon mit Aus- und Einschalten versucht?",
+];
+let attempts = 0;
+const taunt = () => ($("#ticket").textContent = taunts[attempts++ % taunts.length]);
+const PAD = 4; // keep this far from the arena edges
+
+// Current button box in arena coordinates; switches it to absolute positioning on first use.
+const box = () => {
+  const a = arena.getBoundingClientRect();
+  const b = bug.getBoundingClientRect();
+  const r = { x: b.left - a.left, y: b.top - a.top, w: b.width, h: b.height, aw: a.width, ah: a.height };
+  if (bug.style.position !== "absolute") Object.assign(bug.style, { position: "absolute", left: `${r.x}px`, top: `${r.y}px` });
+  return r;
+};
+const moveTo = (x, y) => { bug.style.left = `${x}px`; bug.style.top = `${y}px`; };
+const fits = (r, x, y) => x >= PAD && y >= PAD && x + r.w <= r.aw - PAD && y + r.h <= r.ah - PAD;
+
+// Cornered: teleport to the far side of the arena.
+const escape = (r, px, py) => {
+  moveTo(px < r.aw / 2 ? r.aw - r.w - PAD : PAD, py < r.ah / 2 ? r.ah - r.h - PAD : PAD);
+  taunt();
+};
+
+// Push the button the shortest way so (px, py) ends up `gap` px outside it. Runs on every move.
+const dodge = (clientX, clientY, gap) => {
+  const r = box();
+  const a = arena.getBoundingClientRect();
+  const px = clientX - a.left;
+  const py = clientY - a.top;
+  const ox = Math.max(r.x - px, 0, px - (r.x + r.w));
+  const oy = Math.max(r.y - py, 0, py - (r.y + r.h));
+  if (Math.hypot(ox, oy) >= gap) return;
+  const options = [
+    [px + gap, r.y], // to the right
+    [px - gap - r.w, r.y], // to the left
+    [r.x, py + gap], // below
+    [r.x, py - gap - r.h], // above
+  ].filter(([x, y]) => fits(r, x, y));
+  if (!options.length) return escape(r, px, py);
+  const [x, y] = options.reduce((best, o) =>
+    Math.hypot(o[0] - r.x, o[1] - r.y) < Math.hypot(best[0] - r.x, best[1] - r.y) ? o : best);
+  moveTo(x, y);
+};
+
+const footer = $("footer");
+footer.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") dodge(e.clientX, e.clientY, 6); });
+// Touch has no hover: dodge where the finger lands and keep dodging while it slides. Only block scrolling near the button.
+const onTouch = (e) => {
+  const t = e.touches[0];
+  const b = bug.getBoundingClientRect();
+  if (Math.hypot(Math.max(b.left - t.clientX, 0, t.clientX - b.right), Math.max(b.top - t.clientY, 0, t.clientY - b.bottom)) > 60) return;
+  e.preventDefault();
+  dodge(t.clientX, t.clientY, 18);
+};
+footer.addEventListener("touchstart", onTouch, { passive: false });
+footer.addEventListener("touchmove", onTouch, { passive: false });
+bug.addEventListener("click", (e) => { e.preventDefault(); escape(box(), e.clientX - arena.getBoundingClientRect().left, e.clientY - arena.getBoundingClientRect().top); });
+addEventListener("resize", () => { bug.style.position = ""; });
+</script>
+</body>
+</html>
